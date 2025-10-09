@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "Logging/LogMacros.h"
+#include "InventoryComponent.h"
 #include "CactusGameCharacter.generated.h"
 
 class UInputComponent;
@@ -12,6 +13,8 @@ class USkeletalMeshComponent;
 class UCameraComponent;
 class UInputAction;
 class UInputMappingContext;
+class UHealthComponent;
+class ABaseWeapon;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -36,13 +39,45 @@ class ACactusGameCharacter : public ACharacter
 	/** Move Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category=Input, meta=(AllowPrivateAccess = "true"))
 	UInputAction* MoveAction;
-	
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* InventoryAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* FireAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* WeaponSwitch;
 public:
 	ACactusGameCharacter();
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Inventory")
+	UInventoryComponent* InventoryComponent;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Health")
+	UHealthComponent* HealthComponent;
+
+	//Weapon Properties
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Weapons")
+	TSubclassOf<ABaseWeapon> StartingWeapon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	ABaseWeapon* CurrentWeapon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	ABaseWeapon* PrimaryWeapon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	ABaseWeapon* SecondaryWeapon = nullptr;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	bool bEquipped = false;
+	UFUNCTION()
+	void WeaponSwap();
+
+	
 protected:
 	virtual void BeginPlay();
+	
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 
+	void FireWeapon();
 public:
 		
 	/** Look Input Action */
@@ -56,6 +91,8 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	void CheckInventory(const FInputActionValue& Value);
+
 protected:
 	// APawn interface
 	virtual void SetupPlayerInputComponent(UInputComponent* InputComponent) override;
@@ -68,4 +105,3 @@ public:
 	UCameraComponent* GetFirstPersonCameraComponent() const { return FirstPersonCameraComponent; }
 
 };
-

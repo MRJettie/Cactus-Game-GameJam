@@ -2,6 +2,8 @@
 
 
 #include "BabyCactus.h"
+
+#include "CactusGame/CactusGameCharacter.h"
 #include "Components/StaticMeshComponent.h"
 #include "Components/BoxComponent.h"
 #include "Engine/Engine.h"
@@ -21,16 +23,7 @@ ABabyCactus::ABabyCactus()
 void ABabyCactus::BeginPlay()
 {
 	Super::BeginPlay();
-	if (GEngine)
-	{
-		if (Config)
-		{
-			for (const FCactusNeeds& Entry : Config->Needs)
-			{
-			 GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Tag: %s, Amount: %d"), *Entry.ItemTag.ToString(), Entry.BaseAmount));
-			}
-		}
-	}
+	
 }
 
 // Called every frame
@@ -38,6 +31,47 @@ void ABabyCactus::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABabyCactus::ProgressLevel()
+{
+	if (GEngine)
+	{
+		if (bNeedsMet)
+        	{
+        		Level++;
+        		bNeedsMet = false;
+				int RandRange = FMath::RandRange(1, 15);
+        		NeededAmount+=RandRange;
+        		
+        	}
+	}
+	
+}
+
+void ABabyCactus::Needsheck()
+{
+		UE_LOG(LogTemp, Warning, TEXT("Level %d"), Level);
+		UE_LOG(LogTemp, Warning, TEXT("Needed Amount %d"), NeededAmount);
+	
+}
+
+void ABabyCactus::NotifyActorBeginOverlap(AActor* OtherActor)
+{
+	ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(OtherActor);
+	
+	Super::NotifyActorBeginOverlap(OtherActor);
+	if (Character && Character->InventoryComponent != nullptr)
+	{
+		if (Character->InventoryComponent->TryRemoveWater(NeededAmount))
+		{
+			bNeedsMet = true;
+			ProgressLevel();
+		}
+		Needsheck();
+	}
+	
+	
 }
 
 // Called to bind functionality to input

@@ -3,3 +3,6 @@
 
 #include "CactusConfig.h"
 
+void UCactusConfig::ItemCheck()
+{
+}

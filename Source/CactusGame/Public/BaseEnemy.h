@@ -7,6 +7,7 @@
 #include "BaseEnemy.generated.h"
 class USkeletalMeshComponent;
 class UStaticMeshComponent;
+class UHealthComponent;
 UCLASS()
 class CACTUSGAME_API ABaseEnemy : public ACharacter
 {
@@ -18,17 +19,15 @@ public:
 	UStaticMeshComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
 	USkeletalMeshComponent* SkeletalMesh;
-	
-	//Properties of Base Class
-	float MaxHealth = 100.0f;
-	float Health = MaxHealth;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthComponent)
+	UHealthComponent* HealthComponent;
 
 	//Functions of the Class
 	UFUNCTION()
 	virtual void Patrol();
 	UFUNCTION()
 	virtual void Attack();
-	
+	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	
 protected:
 	// Called when the game starts or when spawned

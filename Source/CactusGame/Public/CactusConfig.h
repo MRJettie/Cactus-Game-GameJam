@@ -13,10 +13,8 @@ struct FCactusNeeds
 	GENERATED_BODY()
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cactus Needs")
-	FGameplayTag ItemTag;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cactus Needs")
-	int BaseAmount = 1;
+	TMap <FName, int> Requirements;
+	
 };
 UCLASS()
 class CACTUSGAME_API UCactusConfig : public UPrimaryDataAsset
@@ -26,11 +24,10 @@ class CACTUSGAME_API UCactusConfig : public UPrimaryDataAsset
 
 public:
 	//Creates an array based on the Struct
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cactus Needs")
-	TArray<FCactusNeeds> Needs;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cactus Needs")
-	int ItemsPerLevel = 1;
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Cactus Needs")
+	UPROPERTY(EditAnywhere, Category = "Cactus Needs")
+	int CurrentLevel;
+	UPROPERTY(EditAnywhere, Category = "Cactus Needs")
 	float MaxHealth = 100.0f;
-	
+	UFUNCTION()
+	void ItemCheck();
 };

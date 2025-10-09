@@ -2,6 +2,7 @@
 
 
 #include "BaseEnemy.h"
+#include "HealthComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 // Sets default values
 ABaseEnemy::ABaseEnemy()
@@ -9,14 +10,30 @@ ABaseEnemy::ABaseEnemy()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Mesh"));
+	RootComponent = SkeletalMesh;
+	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 }
 
 void ABaseEnemy::Patrol()
 {
+	FVector Location = GetActorLocation();
 }
 
 void ABaseEnemy::Attack()
 {
+	FVector StartingLocation = GetActorLocation();
+	FVector Direction = GetActorForwardVector();
+	
+}
+
+float ABaseEnemy::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
+	class AController* EventInstigator, AActor* DamageCauser)
+{
+	if (HealthComponent)
+	{
+		HealthComponent->SimpleDamage(DamageAmount);
+	}
+	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
 // Called when the game starts or when spawned
