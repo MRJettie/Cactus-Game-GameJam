@@ -6,6 +6,7 @@
 AAssaultRifle::AAssaultRifle()
 {
 	MaxMagazine = 30;
+	CurrentMagazine = MaxMagazine;
 	Range = 1000.f;
 	Damage = 20;
 	WeaponName = "Assault Rifle";

@@ -16,7 +16,23 @@ and this project roughly adheres to [Semantic Versioning](https://semver.org/).
 - General polish and performance optimization for release build  
 
 ---
+[v0.2.1] – 2025-10-09
+Fixed
+- Fixed weapon spazzing issue when swapping between primary and secondary weapons.
+- Corrected attachment/detachment logic to ensure consistent weapon visibility.
+- Disabled overlap triggers during swap to prevent rapid reattachment spam.
+- Fixed UI desync issue where secondary weapon ammo wasn’t updating properly.
+- Ensured proper event-driven updates between weapon system and WBP for name and ammo display.
+- General cleanup of weapon swap logic for better readability and maintainability.
 
+Changed
+- Improved WBP integration to rely on C++ event dispatchers instead of manual polling.
+- Updated UI responsiveness for weapon data display.
+
+Known Issues
+- Future update will address visual feedback for swapping (animations, sounds, etc.).
+
+---
 ## [v0.2.0] – 2025-10-08
 ### Added
 - Implemented **BaseWeapon class** and **two child weapon classes**  

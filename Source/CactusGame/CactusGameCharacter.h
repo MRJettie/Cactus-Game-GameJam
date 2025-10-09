@@ -15,6 +15,7 @@ class UInputAction;
 class UInputMappingContext;
 class UHealthComponent;
 class ABaseWeapon;
+class UUserWidget;
 struct FInputActionValue;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
@@ -71,6 +72,11 @@ public:
 	UFUNCTION()
 	void WeaponSwap();
 
+	//User Interface
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User Interface")
+	UUserWidget* WeaponHud = nullptr;
+
+	void CallWidget_ConnectToWeapon(ABaseWeapon* Weapon);
 	
 protected:
 	virtual void BeginPlay();

@@ -8,6 +8,8 @@
 class UStaticMeshComponent;
 class UBoxComponent;
 class USkeletalMeshComponent;
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnAmmoChanged, int, CurrentAmmo, int, MaxAmmo);
+
 UCLASS()
 class CACTUSGAME_API ABaseWeapon : public AActor
 {
@@ -29,6 +31,16 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties")
 	FName WeaponName;
 
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnAmmoChanged OnAmmoChanged;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void ForceBroadcastAmmo();
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void ConsumeAmmo(int Amount);
+
+	
 	//Functions for Weapons
 	virtual void Reload();
 	virtual void Fire();

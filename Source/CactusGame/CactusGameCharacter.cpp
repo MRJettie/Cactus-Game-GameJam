@@ -11,8 +11,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
-#include "SNegativeActionButton.h"
 #include "Engine/Engine.h"
+#include "Blueprint/UserWidget.h"
 #include "Engine/LocalPlayer.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -51,15 +51,27 @@ void ACactusGameCharacter::WeaponSwap()
 {
 	if (CurrentWeapon&&SecondaryWeapon)
 	{
-		CurrentWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-		SecondaryWeapon->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
-
 		ABaseWeapon* Temp = CurrentWeapon;
 		CurrentWeapon=SecondaryWeapon;
-		CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("wepaon_rSocket"));
+		CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("weapon_rSocket"));
 		SecondaryWeapon=Temp;
 		SecondaryWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("SecondaryWeapon"));
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->SetInstigator(this);
+		CallWidget_ConnectToWeapon(CurrentWeapon);
 		
+	}
+}
+
+void ACactusGameCharacter::CallWidget_ConnectToWeapon(ABaseWeapon* Weapon)
+{
+	if (!WeaponHud) return;
+
+	static const FName FuncName(TEXT("ConnectToWeapon")); 
+	if (UFunction* Fn = WeaponHud->FindFunction(FuncName))
+	{
+		struct FParams { ABaseWeapon* Weapon; } Params{ Weapon };
+		WeaponHud->ProcessEvent(Fn, &Params);
 	}
 }
 
@@ -76,16 +88,19 @@ void ACactusGameCharacter::BeginPlay()
 		CurrentWeapon->CurrentMagazine = CurrentWeapon->MaxMagazine;
 		if (CurrentWeapon)
 		{
+			SecondaryWeapon = nullptr;
 			bEquipped = true;
 			CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName(TEXT("weapon_rSocket")));
 			UE_LOG(LogTemp, Warning, TEXT("Weapon Spawned"));
 			CurrentWeapon->Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			CallWidget_ConnectToWeapon(CurrentWeapon);
 		}
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("StarterWeaponClass is NULL — set it in BP defaults!"));
 	}
+	
 }
 
 float ACactusGameCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
@@ -129,7 +144,7 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::FireWeapon);
 
-		EnhancedInputComponent->BindAction(WeaponSwitch,ETriggerEvent::Triggered, this, &ACactusGameCharacter::WeaponSwap);
+		EnhancedInputComponent->BindAction(WeaponSwitch,ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponSwap);
 	}
 	else
 	{

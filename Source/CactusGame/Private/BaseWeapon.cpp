@@ -19,11 +19,23 @@ ABaseWeapon::ABaseWeapon()
 	Box->SetupAttachment(Mesh);
 }
 
+void ABaseWeapon::ForceBroadcastAmmo()
+{
+	OnAmmoChanged.Broadcast(CurrentMagazine,MaxMagazine);
+}
+
+void ABaseWeapon::ConsumeAmmo(int Amount)
+{
+	CurrentMagazine = FMath::Clamp(CurrentMagazine - Amount, 0, MaxMagazine);
+	OnAmmoChanged.Broadcast(CurrentMagazine,MaxMagazine);
+}
+
 void ABaseWeapon::Reload()
 {
 	if (CurrentMagazine < MaxMagazine || CurrentMagazine == 0)
 	{
 		CurrentMagazine = MaxMagazine;
+		OnAmmoChanged.Broadcast(CurrentMagazine,MaxMagazine);
 	}
 }
 
@@ -42,7 +54,7 @@ void ABaseWeapon::Fire()
 		
 		if (CurrentMagazine > 0)
         	{
-        		CurrentMagazine--;
+        		ConsumeAmmo(1);
 				bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 				DrawDebugLine(GetWorld(), Start, bHit ? HitResult.Location : End, FColor::Red, false, 1.f, 0, 1.f);
 				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d"), CurrentMagazine)
@@ -72,18 +84,20 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 	ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(OtherActor);
 	if (Character)
 	{
-		if (!Character->bEquipped)
+		if (!Character->CurrentWeapon)
 		{
-			Character->bEquipped = true;
 			Character->CurrentWeapon = this;
 			SetOwner(Character);
 			if (Character && Character->GetMesh1P())
 			{
 				AttachToComponent(Character->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_rSocket"));
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Mesh->SetGenerateOverlapEvents(false);
+				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Box->SetGenerateOverlapEvents(false);
 			}
 		}
-		else if (Character->CurrentWeapon)
+		if (!Character->SecondaryWeapon)
 		{
 			Character->SecondaryWeapon = this;
 			SetOwner(Character);
@@ -92,14 +106,20 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 			{
 				AttachToComponent(Character->GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("SecondaryWeapon"));
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Mesh->SetGenerateOverlapEvents(false);
+				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				Box->SetGenerateOverlapEvents(false);
 			}
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("Already holding two weapons; ignoring pickup for %s"), *GetName());
 }
 
 // Called when the game starts or when spawned
 void ABaseWeapon::BeginPlay()
 {
+	if (CurrentMagazine == 0)
+		CurrentMagazine = MaxMagazine;
 	Super::BeginPlay();
 	
 }
