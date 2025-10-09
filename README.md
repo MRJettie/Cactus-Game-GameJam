@@ -96,10 +96,12 @@ While built primarily for learning and experience (~90% C++ / 10% Blueprints), t
 - Designed for easy iteration and clean C++/Blueprint communication
 
 ---
-## 🆕 Recent Updates (v0.2.0 – 2025-10-08)
-- Implemented BaseWeapon system and two child classes
-- Added UI elements that update based on equipped weapon
-- Simplified pickup system (multipliers instead of item types)
+## 🆕 Recent Updates (v0.2.1 – 2025-10-09)
+- Fixed weapon swap instability ("spazzing") when switching between primary and secondary weapons.
+- Improved weapon attachment logic and disabled overlap triggers during swaps.
+- Fixed UI desync — weapon name and ammo now properly update when switching weapons.
+- Integrated event-driven updates between weapon system and WBP for cleaner, faster UI refresh.
+- General cleanup and readability improvements in weapon and UI code.
 → [Full Changelog](./CHANGELOG.md)
 ---
 
