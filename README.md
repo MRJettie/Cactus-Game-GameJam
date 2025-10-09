@@ -96,6 +96,12 @@ While built primarily for learning and experience (~90% C++ / 10% Blueprints), t
 - Designed for easy iteration and clean C++/Blueprint communication
 
 ---
+## 🆕 Recent Updates (v0.2.0 – 2025-10-08)
+- Implemented BaseWeapon system and two child classes
+- Added UI elements that update based on equipped weapon
+- Simplified pickup system (multipliers instead of item types)
+→ [Full Changelog](./CHANGELOG.md)
+---
 
 ## 🪶 Credits
 Created by **MRJettie**  
