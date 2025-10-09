@@ -30,6 +30,15 @@ public:
 	float Damage = 10.f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapon Properties")
 	FName WeaponName;
+	UPROPERTY(EditDefaultsOnly, Category="Firing")
+	bool bAutomatic = false;
+	UPROPERTY(EditDefaultsOnly, Category="Firing")
+	float FireRate = 10.f;
+	FTimerHandle FireTimer;
+	UPROPERTY(EditDefaultsOnly, Category="Firing")
+	bool bIsReloading = false;
+	UPROPERTY(EditDefaultsOnly, Category="Firing")
+	float NextShot = 0.0;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnAmmoChanged OnAmmoChanged;
@@ -44,11 +53,21 @@ public:
 	//Functions for Weapons
 	virtual void Reload();
 	virtual void Fire();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	virtual void StartFiring();
+	virtual void StopFiring();
+	virtual bool CanFire() const;
+	virtual void ShotCooldown();
+	void DropWeapon(AActor* OwnerActor, float Distance);
+
+
+	
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* Mesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
+	UStaticMeshComponent* AmmoMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UBoxComponent* Box;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	USkeletalMeshComponent* SkeletalMesh;
 
 	void NotifyActorBeginOverlap(AActor* OtherActor) override;
@@ -60,5 +79,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+private:
+	void DisablePhysics();
+	void EnablePhysics(const FVector& Impulse);
 
 };

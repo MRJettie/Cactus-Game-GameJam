@@ -47,10 +47,12 @@ ACactusGameCharacter::ACactusGameCharacter()
 }
 
 
-void ACactusGameCharacter::WeaponSwap()
+void ACactusGameCharacter::WeaponSwap(const FInputActionValue& Value)
 {
 	if (CurrentWeapon&&SecondaryWeapon)
 	{
+		CurrentWeapon->StopFiring();
+		SecondaryWeapon->StopFiring();
 		ABaseWeapon* Temp = CurrentWeapon;
 		CurrentWeapon=SecondaryWeapon;
 		CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("weapon_rSocket"));
@@ -61,6 +63,29 @@ void ACactusGameCharacter::WeaponSwap()
 		CallWidget_ConnectToWeapon(CurrentWeapon);
 		
 	}
+	
+}
+
+void ACactusGameCharacter::WeaponDrop(const FInputActionValue& Value)
+{
+	if (CurrentWeapon && SecondaryWeapon)
+	{
+		CurrentWeapon->StopFiring();
+		ABaseWeapon* Temp = CurrentWeapon;
+		CurrentWeapon = SecondaryWeapon;
+		SecondaryWeapon = nullptr;
+		bOneWeaponDrop = true;
+		CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("weapon_rSocket"));
+		CurrentWeapon->SetOwner(this);
+		CurrentWeapon->SetInstigator(this);
+		CallWidget_ConnectToWeapon(CurrentWeapon);
+		Temp->DropWeapon(this,200);
+	}
+}
+
+void ACactusGameCharacter::Reload(const FInputActionValue& Value)
+{
+	CurrentWeapon->Reload();
 }
 
 void ACactusGameCharacter::CallWidget_ConnectToWeapon(ABaseWeapon* Weapon)
@@ -93,6 +118,7 @@ void ACactusGameCharacter::BeginPlay()
 			CurrentWeapon->AttachToComponent(GetMesh1P(),FAttachmentTransformRules::SnapToTargetIncludingScale,FName(TEXT("weapon_rSocket")));
 			UE_LOG(LogTemp, Warning, TEXT("Weapon Spawned"));
 			CurrentWeapon->Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+			CurrentWeapon->AmmoMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 			CallWidget_ConnectToWeapon(CurrentWeapon);
 		}
 	}
@@ -113,12 +139,20 @@ float ACactusGameCharacter::TakeDamage(float DamageAmount, struct FDamageEvent c
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
 
-void ACactusGameCharacter::FireWeapon()
+void ACactusGameCharacter::FireWeaponStart(const FInputActionValue& Value)
 {
 	if (CurrentWeapon && bEquipped)
 	{
-		CurrentWeapon->Fire();
+		CurrentWeapon->StartFiring();
 		
+	}
+}
+
+void ACactusGameCharacter::FireWeaponEnd(const FInputActionValue& Value)
+{
+	if (CurrentWeapon)
+	{
+		CurrentWeapon->StopFiring();
 	}
 }
 
@@ -142,9 +176,15 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		//Inventory Check
 		EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::CheckInventory);
 
-		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::FireWeapon);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ACactusGameCharacter::FireWeaponStart);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Canceled,  this, &ACactusGameCharacter::FireWeaponEnd);
+		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ACactusGameCharacter::FireWeaponEnd);
 
 		EnhancedInputComponent->BindAction(WeaponSwitch,ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponSwap);
+
+		EnhancedInputComponent->BindAction(DropItem, ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponDrop);
+
+		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Reload);
 	}
 	else
 	{

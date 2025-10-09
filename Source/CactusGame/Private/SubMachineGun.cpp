@@ -1,19 +1,15 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "AssaultRifle.h"
+#include "SubMachineGun.h"
 
-AAssaultRifle::AAssaultRifle()
+ASubMachineGun::ASubMachineGun()
 {
-	MaxMagazine = 30;
+	MaxMagazine = 25;
 	CurrentMagazine = MaxMagazine;
 	Range = 1000.f;
-	Damage = 20;
-	WeaponName = "Assault Rifle";
-	FireRate = 10.f;
+	Damage = 10;
+	WeaponName = "Sub MachineGun";
+	FireRate = 20.f;
 	bAutomatic = true;
 }
-
-
-
-

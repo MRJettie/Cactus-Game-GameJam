@@ -8,6 +8,7 @@ APistol::APistol()
 	MaxMagazine = 12;
 	CurrentMagazine = MaxMagazine;
 	Range = 500.f;
+	bAutomatic = false;
 	Damage = 5;
 	WeaponName = "Revolver";
 }

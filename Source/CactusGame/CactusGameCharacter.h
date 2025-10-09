@@ -49,6 +49,13 @@ class ACactusGameCharacter : public ACharacter
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* WeaponSwitch;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* DropItem;
+
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ReloadAction;
+	
 public:
 	ACactusGameCharacter();
 	
@@ -63,27 +70,30 @@ public:
 	TSubclassOf<ABaseWeapon> StartingWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 	ABaseWeapon* CurrentWeapon = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	UPROPERTY()
 	ABaseWeapon* PrimaryWeapon = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
+	UPROPERTY()
 	ABaseWeapon* SecondaryWeapon = nullptr;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 	bool bEquipped = false;
+	bool bOneWeaponDrop = false;
 	UFUNCTION()
-	void WeaponSwap();
+	void WeaponSwap(const FInputActionValue& Value);
+	UFUNCTION()
+	void WeaponDrop(const FInputActionValue& Value);
+	UFUNCTION()
+	void Reload(const FInputActionValue& Value);
 
 	//User Interface
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User Interface")
 	UUserWidget* WeaponHud = nullptr;
-
 	void CallWidget_ConnectToWeapon(ABaseWeapon* Weapon);
 	
 protected:
 	virtual void BeginPlay();
-	
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
-
-	void FireWeapon();
+	void FireWeaponStart(const FInputActionValue& Value);
+	void FireWeaponEnd (const FInputActionValue& Value);
 public:
 		
 	/** Look Input Action */

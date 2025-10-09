@@ -14,9 +14,11 @@ ABaseWeapon::ABaseWeapon()
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	AmmoMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ammo Mesh"));
 	SkeletalMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Skeletal Mesh"));
 	RootComponent = Mesh;
 	Box->SetupAttachment(Mesh);
+	AmmoMesh->SetupAttachment(Mesh);
 }
 
 void ABaseWeapon::ForceBroadcastAmmo()
@@ -49,22 +51,24 @@ void ABaseWeapon::Fire()
 		FVector End = Start + Camera->GetForwardVector() * Range;
 
 		FCollisionQueryParams QueryParams;
-		QueryParams.AddIgnoredActor(Owner);
+		QueryParams.AddIgnoredActor(Character);
+		QueryParams.AddIgnoredActor(this);
 		FHitResult HitResult;
 		
 		if (CurrentMagazine > 0)
         	{
         		ConsumeAmmo(1);
+				ShotCooldown();
 				bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 				DrawDebugLine(GetWorld(), Start, bHit ? HitResult.Location : End, FColor::Red, false, 1.f, 0, 1.f);
-				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d"), CurrentMagazine)
+				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d"), CurrentMagazine);
 
 				if (bHit)
 				{
 					AActor* HitActor = HitResult.GetActor();
 					if (HitActor)
 					{
-						UGameplayStatics::ApplyDamage(HitActor, Damage, Owner->GetInstigatorController(), this, nullptr);
+						UGameplayStatics::ApplyDamage(HitActor, Damage, Character->GetInstigatorController(), this, nullptr);
 						UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s for %f damage!"), *HitActor->GetName(), Damage);
 					}
 				}
@@ -78,10 +82,79 @@ void ABaseWeapon::Fire()
 	
 }
 
+void ABaseWeapon::StartFiring()
+{
+	if (!CanFire()) return;
+	Fire(); // fire once immediately
+	
+	if (bAutomatic && FireRate > 0.f)
+	{
+		const float interval = 1.f / FireRate;
+		GetWorldTimerManager().SetTimer(FireTimer, this, &ABaseWeapon::Fire, interval, true, interval);
+	}
+}
+
+void ABaseWeapon::StopFiring()
+{
+	GetWorldTimerManager().ClearTimer(FireTimer);
+}
+
+bool ABaseWeapon::CanFire() const
+{
+	const UWorld* World = GetWorld();
+	if (!World) return false;
+
+	const double Now = World->GetTimeSeconds();
+
+	const bool bHasAmmo = (CurrentMagazine > 0);
+	const bool bCooldownDone = (Now >= NextShot);
+	const bool bReady = bHasAmmo && bCooldownDone && !bIsReloading;
+
+	return bReady;
+}
+
+void ABaseWeapon::ShotCooldown()
+{
+	if (UWorld* World = GetWorld())
+	{
+		const double Now = World->GetTimeSeconds();
+		const double Interval = (FireRate > 0.f) ? (1.0 / FireRate) : 0.0;
+		NextShot = Now + Interval;
+	}
+}
+
+void ABaseWeapon::DropWeapon(AActor* OwnerActor, float Distance)
+{
+	if (!OwnerActor)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner is null"));
+		return;
+	}
+	ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(OwnerActor);
+	if (!Character)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Owner is not a character"));
+		return;
+	}
+	else
+	{
+		DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
+		FVector Start = Character->GetActorLocation();
+		FVector Forward = Character->GetActorForwardVector();
+		FVector DropLocation = Start + Forward * Distance;
+		SetActorLocation(DropLocation,false);
+		EnablePhysics(Forward * 100.f + FVector(0,0,100));
+		SetOwner(nullptr);
+	}
+}
+	
+
+
 void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 {
 	Super::NotifyActorBeginOverlap(OtherActor);
 	ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(OtherActor);
+	DisablePhysics();
 	if (Character)
 	{
 		if (!Character->CurrentWeapon)
@@ -91,13 +164,15 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 			if (Character && Character->GetMesh1P())
 			{
 				AttachToComponent(Character->GetMesh1P(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, FName("weapon_rSocket"));
+				AmmoMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				AmmoMesh->SetGenerateOverlapEvents(false);
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				Mesh->SetGenerateOverlapEvents(false);
 				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				Box->SetGenerateOverlapEvents(false);
 			}
 		}
-		if (!Character->SecondaryWeapon)
+		else if (!Character->SecondaryWeapon)
 		{
 			Character->SecondaryWeapon = this;
 			SetOwner(Character);
@@ -105,6 +180,8 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 			if (Character && Character->GetMesh1P())
 			{
 				AttachToComponent(Character->GetMesh1P(),FAttachmentTransformRules::SnapToTargetNotIncludingScale,FName("SecondaryWeapon"));
+				AmmoMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+				AmmoMesh->SetGenerateOverlapEvents(false);
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				Mesh->SetGenerateOverlapEvents(false);
 				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
@@ -129,5 +206,41 @@ void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+}
+
+void ABaseWeapon::DisablePhysics()
+{
+	if (UPrimitiveComponent* RootPrimitive = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		RootPrimitive->SetSimulatePhysics(false);
+		RootPrimitive->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		RootPrimitive->SetNotifyRigidBodyCollision(false);
+	}
+	if (Box && Mesh)
+	{
+		AmmoMesh->SetGenerateOverlapEvents(false);
+		Mesh->SetGenerateOverlapEvents(false);
+		Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		Box->SetGenerateOverlapEvents(false);
+	}
+}
+
+void ABaseWeapon::EnablePhysics(const FVector& Impulse)
+{
+	
+	if (UPrimitiveComponent* RootPrimitive = Cast<UPrimitiveComponent>(GetRootComponent()))
+	{
+		RootPrimitive->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
+		RootPrimitive->SetSimulatePhysics(true);
+		RootPrimitive->SetNotifyRigidBodyCollision(false);
+		RootPrimitive->AddImpulse(Impulse, NAME_None, true);
+	}
+	if (Box && Mesh)
+	{
+		AmmoMesh->SetGenerateOverlapEvents(false);
+		Mesh->SetGenerateOverlapEvents(false);
+		Box->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+		Box->SetGenerateOverlapEvents(true);
+	}
 }
 
