@@ -16,7 +16,7 @@ and this project roughly adheres to [Semantic Versioning](https://semver.org/).
 - General polish and performance optimization for release build  
 
 ---
-[v0.2.1] – 2025-10-09
+## [v0.2.1] – 2025-10-09
 Fixed
 - Fixed weapon spazzing issue when swapping between primary and secondary weapons.
 - Corrected attachment/detachment logic to ensure consistent weapon visibility.
