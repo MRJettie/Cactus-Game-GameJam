@@ -17,20 +17,31 @@ and this project roughly adheres to [Semantic Versioning](https://semver.org/).
 
 ---
 ## [v0.2.1] – 2025-10-09
-Fixed
+
+### Added
+- Implemented **StartFiring()** and **StopFiring()** functions for full-auto weapons.
+- Added **SMG** and **Assault Rifle** child classes utilizing the new auto-fire system.
+- Introduced **pellet spread logic** for the shotgun by overriding the `Fire()` function.
+
+### Fixed
 - Fixed weapon spazzing issue when swapping between primary and secondary weapons.
 - Corrected attachment/detachment logic to ensure consistent weapon visibility.
 - Disabled overlap triggers during swap to prevent rapid reattachment spam.
 - Fixed UI desync issue where secondary weapon ammo wasn’t updating properly.
 - Ensured proper event-driven updates between weapon system and WBP for name and ammo display.
+- Full-auto firing now functions correctly when holding the fire input.
+- Fixed **weapon drop physics** and **re-equip behavior**, ensuring state variables persist correctly after pickup.
+- Resolved **UI desync issues** when dropping or reattaching weapons.
+- Cleaned up redundant logs and improved internal consistency across the BaseWeapon hierarchy.
 - General cleanup of weapon swap logic for better readability and maintainability.
 
-Changed
+### Changed
 - Improved WBP integration to rely on C++ event dispatchers instead of manual polling.
 - Updated UI responsiveness for weapon data display.
 
-Known Issues
+### Known Issues
 - Future update will address visual feedback for swapping (animations, sounds, etc.).
+-  Player can currently **pick up multiple instances of the same weapon**, which is not intended.
 
 ---
 ## [v0.2.0] – 2025-10-08
