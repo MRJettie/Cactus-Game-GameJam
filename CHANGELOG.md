@@ -16,6 +16,23 @@ and this project roughly adheres to [Semantic Versioning](https://semver.org/).
 - General polish and performance optimization for release build  
 
 ---
+## [v0.2.2] – 2025-10-11
+
+### Added
+- Created **Enemy Test Dummy** derived from `ABaseEnemy` for controlled shooting and damage testing.
+- Implemented **Damage Resistance Formula** within `UHealthComponent` to reduce incoming damage based on resistance percentage.
+- Began development of a **Damage Multiplier System** allowing player damage to scale based on collectible items.
+
+### Improved
+- Added **safeguard** to prevent infinite damage scaling within the multiplier system.
+- Performed general validation of the **damage pipeline** between weapons, line trace logic, and `HealthComponent`.
+
+### Known Issues
+- **Damage Multiplier** continues to scale infinitely after each shot — a temporary condition currently prevents firing.
+- Multiplier currently applies only to the **currently equipped weapon**, not to newly picked-up weapons.
+- Multiplier values **do not persist across weapon swaps** — pending shared system implementation.
+
+---
 ## [v0.2.1] – 2025-10-09
 
 ### Added
