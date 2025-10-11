@@ -81,9 +81,9 @@ While built primarily for learning and experience (~90% C++ / 10% Blueprints), t
 ---
 
 ## 🐞 Known Issues
-- Weapon switching and UI desync after swaps  
-- Secondary weapon either completely disappears or overlaps primary weapon  
-- Primary weapon displays correct information while secondary weapon only provides weapon name in the ui
+- **Damage Multiplier** continues to scale infinitely after each shot — a temporary condition currently prevents firing.
+- Multiplier currently applies only to the **currently equipped weapon**, not to newly picked-up weapons.
+- Multiplier values **do not persist across weapon swaps** — pending shared system implementation.
 
 ---
 
@@ -96,12 +96,11 @@ While built primarily for learning and experience (~90% C++ / 10% Blueprints), t
 - Designed for easy iteration and clean C++/Blueprint communication
 
 ---
-## 🆕 Recent Updates (v0.2.1 – 2025-10-09)
-- Fixed weapon swap instability ("spazzing") when switching between primary and secondary weapons.
-- Improved weapon attachment logic and disabled overlap triggers during swaps.
-- Fixed UI desync — weapon name and ammo now properly update when switching weapons.
-- Integrated event-driven updates between weapon system and WBP for cleaner, faster UI refresh.
-- General cleanup and readability improvements in weapon and UI code.
+## 🆕 Recent Updates [v0.2.2] – 2025-10-11
+### Added
+- Created **Enemy Test Dummy** derived from `ABaseEnemy` for controlled shooting and damage testing.
+- Implemented **Damage Resistance Formula** within `UHealthComponent` to reduce incoming damage based on resistance percentage.
+- Began development of a **Damage Multiplier System** allowing player damage to scale based on collectible items.
 → [Full Changelog](./CHANGELOG.md)
 ---
 
