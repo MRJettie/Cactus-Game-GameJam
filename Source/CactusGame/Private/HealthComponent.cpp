@@ -23,11 +23,12 @@ void UHealthComponent::HealthIncrease()
 	}
 }
 
-void UHealthComponent::SimpleDamage(float Damage)
+void UHealthComponent::ApplyDamage(float Damage)
 {
 	if (Health > 0)
 	{
 		Health = FMath::Clamp(Health - Damage, 0.0f, MaxHealth);
+		UE_LOG(LogTemp, Warning, TEXT("Health: %f, Reduced Damage: %f"), Health, Damage);
 		if (Health == 0)
 		{
 			GetOwner()->Destroy();
@@ -35,6 +36,12 @@ void UHealthComponent::SimpleDamage(float Damage)
 	}
 }
 
+
+float UHealthComponent::DamageReduction(float Damage)
+{
+	const float FinalDamage = Damage *(1.0f - DamageResistance);
+	return Damage = FinalDamage;
+}
 
 // Called when the game starts
 void UHealthComponent::BeginPlay()

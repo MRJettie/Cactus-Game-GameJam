@@ -19,6 +19,7 @@ ABaseWeapon::ABaseWeapon()
 	RootComponent = Mesh;
 	Box->SetupAttachment(Mesh);
 	AmmoMesh->SetupAttachment(Mesh);
+	
 }
 
 void ABaseWeapon::ForceBroadcastAmmo()
@@ -49,7 +50,7 @@ void ABaseWeapon::Fire()
 		UCameraComponent* Camera = Character->GetFirstPersonCameraComponent();
 		FVector Start = Camera->GetComponentLocation();
 		FVector End = Start + Camera->GetForwardVector() * Range;
-
+		
 		FCollisionQueryParams QueryParams;
 		QueryParams.AddIgnoredActor(Character);
 		QueryParams.AddIgnoredActor(this);
@@ -61,7 +62,7 @@ void ABaseWeapon::Fire()
 				ShotCooldown();
 				bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 				DrawDebugLine(GetWorld(), Start, bHit ? HitResult.Location : End, FColor::Red, false, 1.f, 0, 1.f);
-				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d"), CurrentMagazine);
+				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d, Dmg Per Shot: %f"), CurrentMagazine, Damage);
 
 				if (bHit)
 				{
@@ -69,7 +70,6 @@ void ABaseWeapon::Fire()
 					if (HitActor)
 					{
 						UGameplayStatics::ApplyDamage(HitActor, Damage, Character->GetInstigatorController(), this, nullptr);
-						UE_LOG(LogTemp, Warning, TEXT("Hit actor: %s for %f damage!"), *HitActor->GetName(), Damage);
 					}
 				}
 				if (CurrentMagazine == 0)
@@ -118,7 +118,16 @@ void ABaseWeapon::ShotCooldown()
 	if (UWorld* World = GetWorld())
 	{
 		const double Now = World->GetTimeSeconds();
-		const double Interval = (FireRate > 0.f) ? (1.0 / FireRate) : 0.0;
+		double Interval;
+		if (FireRate > 0.f)
+		{
+			Interval = 1.f / FireRate;
+		}
+		else
+		{
+			Interval = 0.f;
+		}
+		
 		NextShot = Now + Interval;
 	}
 }

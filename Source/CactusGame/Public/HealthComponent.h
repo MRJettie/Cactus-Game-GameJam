@@ -21,8 +21,13 @@ public:
 	float Health = MaxHealth;
 	UFUNCTION(BlueprintCallable, Category = "Health")
 	void HealthIncrease();
-	void SimpleDamage(float Damage);
+	void ApplyDamage(float Damage);
 	bool bIsDead = false;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Damage Resistance")
+	float DamageResistance = 0.0f;
+	UFUNCTION()
+	float DamageReduction(float Damage);
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;

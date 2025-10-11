@@ -5,9 +5,9 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "BaseEnemy.generated.h"
-class USkeletalMeshComponent;
 class UStaticMeshComponent;
 class UHealthComponent;
+class UBoxComponent;
 UCLASS()
 class CACTUSGAME_API ABaseEnemy : public ACharacter
 {
@@ -15,11 +15,9 @@ class CACTUSGAME_API ABaseEnemy : public ACharacter
 
 public:
 	ABaseEnemy();
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh")
 	UStaticMeshComponent* Weapon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Mesh)
-	USkeletalMeshComponent* SkeletalMesh;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HealthComponent)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
 	UHealthComponent* HealthComponent;
 
 	//Functions of the Class

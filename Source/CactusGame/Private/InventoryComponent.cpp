@@ -34,6 +34,22 @@ void UInventoryComponent::CheckWater()
 	}
 }
 
+void UInventoryComponent::AddXP(int Amount)
+{
+	
+}
+
+void UInventoryComponent::AddCoins(int Amount)
+{
+	
+}
+
+float UInventoryComponent::AddDmgMultiplier(float Amount)
+{
+	DmgMultiplier *= Amount;
+	return Amount;
+}
+
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {

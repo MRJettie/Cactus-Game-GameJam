@@ -134,7 +134,8 @@ float ACactusGameCharacter::TakeDamage(float DamageAmount, struct FDamageEvent c
 {
 	if (HealthComponent)
 	{
-		HealthComponent->SimpleDamage(DamageAmount);
+		float ReducedAmount = HealthComponent->DamageReduction(DamageAmount);
+		HealthComponent->ApplyDamage(ReducedAmount);
 	}
 	return Super::TakeDamage(DamageAmount, DamageEvent, EventInstigator, DamageCauser);
 }
@@ -143,7 +144,16 @@ void ACactusGameCharacter::FireWeaponStart(const FInputActionValue& Value)
 {
 	if (CurrentWeapon && bEquipped)
 	{
-		CurrentWeapon->StartFiring();
+		if (CurrentWeapon->Damage == CurrentWeapon->Damage)
+		{
+			CurrentWeapon->StartFiring();
+		}
+		else 
+		{
+			InventoryComponent->AddDmgMultiplier(CurrentWeapon->Damage);
+			CurrentWeapon->StartFiring();
+		}
+		
 		
 	}
 }
@@ -152,7 +162,12 @@ void ACactusGameCharacter::FireWeaponEnd(const FInputActionValue& Value)
 {
 	if (CurrentWeapon)
 	{
-		CurrentWeapon->StopFiring();
+		if (CurrentWeapon->Damage == CurrentWeapon->Damage)
+		
+			CurrentWeapon->StopFiring();
+		
+		
+		
 	}
 }
 
