@@ -1,17 +1,23 @@
-# Ignore Unreal build artifacts
+# Unreal Engine build artifacts
 Binaries/
 DerivedDataCache/
 Intermediate/
 Saved/
 
-# Ignore Visual Studio user files
+# IDE / Editor files
 .vscode/
 .vs/
+.idea/
+*.sln
 *.VC.db
 *.VC.opendb
 
-# Ignore macOS junk (if you ever zip/move)
+# Logs & temp
+*.log
+*.tmp
+
+# macOS junk
 .DS_Store
 
-# Ignore Windows junk
+# Windows junk
 Thumbs.db
