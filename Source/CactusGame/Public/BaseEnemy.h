@@ -19,7 +19,10 @@ public:
 	UStaticMeshComponent* Weapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "HealthComponent")
 	UHealthComponent* HealthComponent;
-
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Drop Value")
+	int EnemyXP = 15;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Enemy Drop Value")
+	int EnemyCoins = 5;
 	//Functions of the Class
 	UFUNCTION()
 	virtual void Patrol();

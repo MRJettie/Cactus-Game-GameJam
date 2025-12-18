@@ -7,10 +7,8 @@
 #include "CactusGame/CactusGameCharacter.h"
 #include "Kismet/GameplayStatics.h"
 
-// Sets default values
 ABaseWeapon::ABaseWeapon()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	Box = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
@@ -44,6 +42,7 @@ void ABaseWeapon::Reload()
 
 void ABaseWeapon::Fire()
 {
+	const float FinalDamage = CalculateDamage() + Damage;
 	AActor* WeaponOwner = GetOwner();
 	if (ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(WeaponOwner))
 	{
@@ -62,14 +61,14 @@ void ABaseWeapon::Fire()
 				ShotCooldown();
 				bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 				DrawDebugLine(GetWorld(), Start, bHit ? HitResult.Location : End, FColor::Red, false, 1.f, 0, 1.f);
-				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d, Dmg Per Shot: %f"), CurrentMagazine, Damage);
+				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d, Dmg Per Shot: %f"), CurrentMagazine, FinalDamage);
 
 				if (bHit)
 				{
 					AActor* HitActor = HitResult.GetActor();
 					if (HitActor)
 					{
-						UGameplayStatics::ApplyDamage(HitActor, Damage, Character->GetInstigatorController(), this, nullptr);
+						UGameplayStatics::ApplyDamage(HitActor, FinalDamage, Character->GetInstigatorController(), this, nullptr);
 					}
 				}
 				if (CurrentMagazine == 0)
@@ -130,6 +129,16 @@ void ABaseWeapon::ShotCooldown()
 		
 		NextShot = Now + Interval;
 	}
+}
+
+float ABaseWeapon::CalculateDamage()
+{
+	if (ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(GetOwner()))
+	{
+		return Damage * Character->GlobalDmgMultiplier;
+		
+	}
+	return Damage;
 }
 
 void ABaseWeapon::DropWeapon(AActor* OwnerActor, float Distance)
@@ -201,7 +210,6 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 	UE_LOG(LogTemp, Warning, TEXT("Already holding two weapons; ignoring pickup for %s"), *GetName());
 }
 
-// Called when the game starts or when spawned
 void ABaseWeapon::BeginPlay()
 {
 	if (CurrentMagazine == 0)
@@ -210,7 +218,6 @@ void ABaseWeapon::BeginPlay()
 	
 }
 
-// Called every frame
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);

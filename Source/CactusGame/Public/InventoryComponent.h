@@ -5,19 +5,9 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnXPChanged, int, XP,int, XpToLevel);
 class ABaseWeapon;
 
-USTRUCT(BlueprintType)
-	struct FInventoryItem
-	{
-	GENERATED_BODY()
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-		FName ItemName;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
-		int Amount;
-		
-	};
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CACTUSGAME_API UInventoryComponent : public UActorComponent
 {
@@ -28,8 +18,12 @@ public:
 	UInventoryComponent();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int Coins = 0;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+	int XPToLevel = 100;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
 	int XP = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
+	int Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int DmgMultiplier = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
@@ -45,12 +39,14 @@ public:
 	void AddCoins(int Amount);
 	UFUNCTION()
 	float AddDmgMultiplier(float Amount);
+
+	//Events
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnXPChanged OnXPChanged;
 protected:
-	// Called when the game starts
 	virtual void BeginPlay() override;
 
 public:	
-	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
 
 		

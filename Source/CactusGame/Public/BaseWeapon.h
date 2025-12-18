@@ -57,6 +57,8 @@ public:
 	virtual void StopFiring();
 	virtual bool CanFire() const;
 	virtual void ShotCooldown();
+	UFUNCTION()
+	float CalculateDamage();
 	void DropWeapon(AActor* OwnerActor, float Distance);
 
 
@@ -73,7 +75,6 @@ public:
 	void NotifyActorBeginOverlap(AActor* OtherActor) override;
 	
 protected:
-	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
 public:	

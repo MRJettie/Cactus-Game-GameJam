@@ -17,30 +17,19 @@
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
-//////////////////////////////////////////////////////////////////////////
-// ACactusGameCharacter
-
 ACactusGameCharacter::ACactusGameCharacter()
 {
-	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(55.f, 96.0f);
-		
-	// Create a CameraComponent	
 	FirstPersonCameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("FirstPersonCamera"));
 	FirstPersonCameraComponent->SetupAttachment(GetCapsuleComponent());
 	FirstPersonCameraComponent->SetRelativeLocation(FVector(-10.f, 0.f, 60.f)); // Position the camera
 	FirstPersonCameraComponent->bUsePawnControlRotation = true;
-	
-	// Create a mesh component that will be used when being viewed from a '1st person' view (when controlling this pawn)
 	Mesh1P = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("CharacterMesh1P"));
 	Mesh1P->SetOnlyOwnerSee(true);
 	Mesh1P->SetupAttachment(FirstPersonCameraComponent);
 	Mesh1P->bCastDynamicShadow = false;
 	Mesh1P->CastShadow = false;
-	//Mesh1P->SetRelativeRotation(FRotator(0.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-30.f, 0.f, -150.f));
-
-	//Attaches Inventory Component
 	InventoryComponent = CreateDefaultSubobject<UInventoryComponent>(TEXT("Inventory"));
 	HealthComponent = CreateDefaultSubobject<UHealthComponent>(TEXT("HealthComponent"));
 
@@ -102,7 +91,6 @@ void ACactusGameCharacter::CallWidget_ConnectToWeapon(ABaseWeapon* Weapon)
 
 void ACactusGameCharacter::BeginPlay()
 {
-	// Call the base class  
 	Super::BeginPlay();
 	if (StartingWeapon)
 	{
@@ -144,16 +132,7 @@ void ACactusGameCharacter::FireWeaponStart(const FInputActionValue& Value)
 {
 	if (CurrentWeapon && bEquipped)
 	{
-		if (CurrentWeapon->Damage == CurrentWeapon->Damage)
-		{
 			CurrentWeapon->StartFiring();
-		}
-		else 
-		{
-			InventoryComponent->AddDmgMultiplier(CurrentWeapon->Damage);
-			CurrentWeapon->StartFiring();
-		}
-		
 		
 	}
 }
@@ -163,42 +142,29 @@ void ACactusGameCharacter::FireWeaponEnd(const FInputActionValue& Value)
 	if (CurrentWeapon)
 	{
 		if (CurrentWeapon->Damage == CurrentWeapon->Damage)
-		
+		{
 			CurrentWeapon->StopFiring();
-		
-		
-		
+		}
+
 	}
 }
 
-//////////////////////////////////////////////////////////////////////////// Input
-
+/*				Input			*/
 void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {	
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-
-		// Moving
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Move);
-
-		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Look);
-
-		//Inventory Check
 		EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::CheckInventory);
-
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ACactusGameCharacter::FireWeaponStart);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Canceled,  this, &ACactusGameCharacter::FireWeaponEnd);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Completed, this, &ACactusGameCharacter::FireWeaponEnd);
-
 		EnhancedInputComponent->BindAction(WeaponSwitch,ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponSwap);
-
 		EnhancedInputComponent->BindAction(DropItem, ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponDrop);
-
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Reload);
 	}
 	else
@@ -210,12 +176,11 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 
 void ACactusGameCharacter::Move(const FInputActionValue& Value)
 {
-	// input is a Vector2D
 	FVector2D MovementVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add movement 
+		
 		AddMovementInput(GetActorForwardVector(), MovementVector.Y);
 		AddMovementInput(GetActorRightVector(), MovementVector.X);
 	}
@@ -223,12 +188,11 @@ void ACactusGameCharacter::Move(const FInputActionValue& Value)
 
 void ACactusGameCharacter::Look(const FInputActionValue& Value)
 {
-	// input is a Vector2D
+	
 	FVector2D LookAxisVector = Value.Get<FVector2D>();
 
 	if (Controller != nullptr)
 	{
-		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
 		AddControllerPitchInput(LookAxisVector.Y);
 	}

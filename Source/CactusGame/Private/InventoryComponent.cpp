@@ -2,18 +2,13 @@
 
 
 #include "InventoryComponent.h"
-
-#include "IDetailTreeNode.h"
 #include "Engine/Engine.h"
 
-// Sets default values for this component's properties
+
 UInventoryComponent::UInventoryComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
+	
 }
 
 bool UInventoryComponent::TryRemoveWater(int Amount)
@@ -36,12 +31,33 @@ void UInventoryComponent::CheckWater()
 
 void UInventoryComponent::AddXP(int Amount)
 {
-	
+	XP+=Amount;
+	while (XP >= XPToLevel)
+	{
+		
+		int RemainderXP = XP - XPToLevel;
+		int XPIncrease = XPToLevel + Level * 124;
+		Level++;
+		XPToLevel = XPIncrease;
+		XP = RemainderXP;
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Level: %d"), Level));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("XP: %d"), XP));
+			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("XPToLevel: %d"), XPToLevel));
+		}
+		
+	}
+	OnXPChanged.Broadcast(XP,XPToLevel);
 }
 
 void UInventoryComponent::AddCoins(int Amount)
 {
-	
+	Coins += Amount;
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Coins: %d"), Coins));
+	}
 }
 
 float UInventoryComponent::AddDmgMultiplier(float Amount)
@@ -50,21 +66,21 @@ float UInventoryComponent::AddDmgMultiplier(float Amount)
 	return Amount;
 }
 
-// Called when the game starts
+
 void UInventoryComponent::BeginPlay()
 {
+	OnXPChanged.Broadcast(XP,XPToLevel);
 	Super::BeginPlay();
 
-	// ...
+
 	
 }
 
 
-// Called every frame
+
 void UInventoryComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
-
-	// ...
+	
 }
 
