@@ -4,7 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GrenadeData.h"
 #include "GrenadeBase.generated.h"
+
 
 UCLASS()
 class CACTUSGAME_API AGrenadeBase : public AActor
@@ -14,7 +16,11 @@ class CACTUSGAME_API AGrenadeBase : public AActor
 public:	
 	// Sets default values for this actor's properties
 	AGrenadeBase();
+	UPROPERTY(EditDefaultsOnly,BlueprintReadOnly, Category = "Grenade Attributes")
+	UGrenadeData* GrenadeData;
 
+void GrenadeThrow();
+void GrenadeExplode();
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
