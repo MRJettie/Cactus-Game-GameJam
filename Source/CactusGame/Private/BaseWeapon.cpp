@@ -108,8 +108,9 @@ bool ABaseWeapon::CanFire() const
 	const bool bHasAmmo = (CurrentMagazine > 0);
 	const bool bCooldownDone = (Now >= NextShot);
 	const bool bReady = bHasAmmo && bCooldownDone && !bIsReloading;
-
+	
 	return bReady;
+	
 }
 
 void ABaseWeapon::ShotCooldown()
@@ -187,7 +188,7 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				Mesh->SetGenerateOverlapEvents(false);
 				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				Box->SetGenerateOverlapEvents(false);
+				Box->SetGenerateOverlapEvents(false);+
 			}
 		}
 		else if (!Character->SecondaryWeapon)
