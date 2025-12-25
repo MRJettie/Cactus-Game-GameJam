@@ -37,11 +37,9 @@ void UInventoryComponent::AddXP(int Amount)
 	while (XP >= XPToLevel)
 	{
 		
-		int RemainderXP = XP - XPToLevel;
-		int XPIncrease = XPToLevel + Level * 124;
+		XP -= XPToLevel; 
 		Level++;
-		XPToLevel = XPIncrease;
-		XP = RemainderXP;
+		XPToLevel += Level * 124;
 		if (GEngine)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Level: %d"), Level));
@@ -50,7 +48,7 @@ void UInventoryComponent::AddXP(int Amount)
 		}
 		
 	}
-	OnXPChanged.Broadcast(XP,XPToLevel);
+	OnXPChanged.Broadcast(XP, XPToLevel, Level);
 }
 
 void UInventoryComponent::AddCoins(int Amount)
@@ -87,7 +85,7 @@ void UInventoryComponent::ApplyBuff(const UItemBuffs* Buffs)
 
 void UInventoryComponent::BeginPlay()
 {
-	OnXPChanged.Broadcast(XP,XPToLevel);
+	
 	Super::BeginPlay();
 
 

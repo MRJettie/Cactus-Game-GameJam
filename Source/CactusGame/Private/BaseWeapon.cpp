@@ -64,6 +64,7 @@ void ABaseWeapon::Fire()
 				bool bHit = GetWorld()->LineTraceSingleByChannel(HitResult, Start, End, ECC_Visibility, QueryParams);
 				DrawDebugLine(GetWorld(), Start, bHit ? HitResult.Location : End, FColor::Red, false, 1.f, 0, 1.f);
 				UE_LOG(LogTemp, Warning, TEXT("Current Magazine: %d, Dmg Per Shot: %f"), CurrentMagazine, FinalDamage);
+		
 
 				if (bHit)
 				{
@@ -149,7 +150,7 @@ float ABaseWeapon::CalculateDamage()
 {
 	if (ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(GetOwner()))
 	{
-		return Damage * Character->GlobalDmgMultiplier;
+		return Damage * Character->InventoryComponent->DmgMultiplier;
 		
 	}
 	return Damage;

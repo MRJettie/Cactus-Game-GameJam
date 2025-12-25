@@ -66,8 +66,6 @@ public:
 	TSubclassOf<ABaseWeapon> StartingWeapon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
 	ABaseWeapon* CurrentWeapon = nullptr;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Weapons")
-	float GlobalDmgMultiplier = 1.0f;
 	UPROPERTY()
 	ABaseWeapon* PrimaryWeapon = nullptr;
 	UPROPERTY()

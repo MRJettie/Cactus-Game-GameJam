@@ -5,10 +5,10 @@
 #include "CoreMinimal.h"
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
-DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnXPChanged, int, XP,int, XpToLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnXPChanged, int32, NewXP, int32, NewXPToLevel, int32, NewLevel);
 class ABaseWeapon;
 
-UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
 class CACTUSGAME_API UInventoryComponent : public UActorComponent
 {
 	GENERATED_BODY()
@@ -39,7 +39,7 @@ public:
 	UFUNCTION()
 	void CheckWater();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddXP(int Amount);
 	UFUNCTION()
 	void AddCoins(int Amount);
@@ -50,7 +50,7 @@ public:
 	void ApplyBuff(const UItemBuffs* Buffs);
 
 	//Events
-	UPROPERTY(BlueprintAssignable, Category = "Events")
+	UPROPERTY(BlueprintAssignable, Category="XP")
 	FOnXPChanged OnXPChanged;
 protected:
 	virtual void BeginPlay() override;
