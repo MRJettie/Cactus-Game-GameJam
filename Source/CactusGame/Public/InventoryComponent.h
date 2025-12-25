@@ -18,6 +18,8 @@ public:
 	UInventoryComponent();
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int Coins = 0;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+    int CoinMultiplier = 0;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
 	int XPToLevel = 100;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Level")
@@ -26,6 +28,10 @@ public:
 	int Level = 1;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int DmgMultiplier = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int SpeedMultiplier = 1;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
+	int JumpCount;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Item")
 	int WaterAmount = 1000;
 	UFUNCTION()
@@ -39,6 +45,9 @@ public:
 	void AddCoins(int Amount);
 	UFUNCTION()
 	float AddDmgMultiplier(float Amount);
+	
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void ApplyBuff(const UItemBuffs* Buffs);
 
 	//Events
 	UPROPERTY(BlueprintAssignable, Category = "Events")

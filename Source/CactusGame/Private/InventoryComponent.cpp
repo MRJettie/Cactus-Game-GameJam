@@ -2,6 +2,8 @@
 
 
 #include "InventoryComponent.h"
+
+#include "ItemBuffs.h"
 #include "Engine/Engine.h"
 
 
@@ -64,6 +66,22 @@ float UInventoryComponent::AddDmgMultiplier(float Amount)
 {
 	DmgMultiplier *= Amount;
 	return Amount;
+}
+
+void UInventoryComponent::ApplyBuff(const UItemBuffs* Buffs)
+{
+	if (Buffs)
+	{
+		if (Buffs->DMGModifier != 1)
+		{
+			DmgMultiplier *= Buffs->DMGModifier;
+		}
+		if (Buffs->SpeedModifier != 1)
+		{
+			SpeedMultiplier *= Buffs->SpeedModifier;
+		}
+	}
+	
 }
 
 

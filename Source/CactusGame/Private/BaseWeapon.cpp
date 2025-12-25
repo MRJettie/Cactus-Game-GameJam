@@ -2,6 +2,8 @@
 
 
 #include "BaseWeapon.h"
+
+#include "ItemBuffs.h"
 #include "Camera/CameraComponent.h"
 #include "Components/BoxComponent.h"
 #include "CactusGame/CactusGameCharacter.h"
@@ -132,6 +134,17 @@ void ABaseWeapon::ShotCooldown()
 	}
 }
 
+void ABaseWeapon::ApplyWeaponBuff(UItemBuffs* Buff)
+{
+	if (Buff)
+	{
+		if (Buff->DMGModifier != 1)
+		{
+			Damage *= Buff->DMGModifier;
+		}
+	}
+}
+
 float ABaseWeapon::CalculateDamage()
 {
 	if (ACactusGameCharacter* Character = Cast<ACactusGameCharacter>(GetOwner()))
@@ -188,7 +201,7 @@ void ABaseWeapon::NotifyActorBeginOverlap(AActor* OtherActor)
 				Mesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 				Mesh->SetGenerateOverlapEvents(false);
 				Box->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-				Box->SetGenerateOverlapEvents(false);+
+				Box->SetGenerateOverlapEvents(false);
 			}
 		}
 		else if (!Character->SecondaryWeapon)

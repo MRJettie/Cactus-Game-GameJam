@@ -57,6 +57,8 @@ public:
 	virtual void StopFiring();
 	virtual bool CanFire() const;
 	virtual void ShotCooldown();
+	UFUNCTION(BlueprintCallable)
+	void ApplyWeaponBuff(UItemBuffs* Buff);
 	UFUNCTION()
 	float CalculateDamage();
 	void DropWeapon(AActor* OwnerActor, float Distance);

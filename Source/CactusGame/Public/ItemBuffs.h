@@ -17,7 +17,7 @@ class CACTUSGAME_API UItemBuffs : public UDataAsset
 	GENERATED_BODY()
 public:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mesh")
-	UStaticMeshComponent* Mesh;
+	UStaticMesh* Mesh;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Buffs")
 	int DMGModifier;
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Buffs")
