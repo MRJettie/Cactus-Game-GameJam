@@ -40,12 +40,6 @@ void UInventoryComponent::AddXP(int Amount)
 		XP -= XPToLevel; 
 		Level++;
 		XPToLevel += Level * 124;
-		if (GEngine)
-		{
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Level: %d"), Level));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("XP: %d"), XP));
-			GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("XPToLevel: %d"), XPToLevel));
-		}
 		
 	}
 	OnXPChanged.Broadcast(XP, XPToLevel, Level);
@@ -54,10 +48,7 @@ void UInventoryComponent::AddXP(int Amount)
 void UInventoryComponent::AddCoins(int Amount)
 {
 	Coins += Amount;
-	if (GEngine)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, FString::Printf(TEXT("Coins: %d"), Coins));
-	}
+	OnCoinsChanged.Broadcast(Coins);
 }
 
 float UInventoryComponent::AddDmgMultiplier(float Amount)

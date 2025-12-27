@@ -6,6 +6,8 @@
 #include "Components/ActorComponent.h"
 #include "InventoryComponent.generated.h"
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_ThreeParams(FOnXPChanged, int32, NewXP, int32, NewXPToLevel, int32, NewLevel);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCoinsChanged, int32, NewCoins);
+
 class ABaseWeapon;
 
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent), Blueprintable )
@@ -52,6 +54,8 @@ public:
 	//Events
 	UPROPERTY(BlueprintAssignable, Category="XP")
 	FOnXPChanged OnXPChanged;
+	UPROPERTY(BlueprintAssignable, Category="Coins")
+	FOnCoinsChanged OnCoinsChanged;
 protected:
 	virtual void BeginPlay() override;
 

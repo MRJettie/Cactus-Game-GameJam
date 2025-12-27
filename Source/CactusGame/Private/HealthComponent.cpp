@@ -10,13 +10,14 @@ UHealthComponent::UHealthComponent()
 }
 
 
-void UHealthComponent::HealthIncrease()
+void UHealthComponent::IncreaseMaxHealth()
 {
 	if (Health>0)
 	{
 		MaxHealth += 50;
 		Health = MaxHealth;
 	}
+	OnHealthChanged.Broadcast(Health, MaxHealth);
 }
 
 void UHealthComponent::ApplyDamage(float Damage)
@@ -43,8 +44,8 @@ float UHealthComponent::DamageReduction(float Damage)
 void UHealthComponent::BeginPlay()
 {
 	Super::BeginPlay();
-
-
+	
+	OnHealthChanged.Broadcast(Health, MaxHealth);
 	
 }
 

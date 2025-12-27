@@ -6,7 +6,7 @@
 #include "Components/ActorComponent.h"
 #include "HealthComponent.generated.h"
 
-
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnHealthChanged, float, NewHealth, float, MaxHealth);
 UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CACTUSGAME_API UHealthComponent : public UActorComponent
 {
@@ -19,8 +19,7 @@ public:
 	float MaxHealth = 100.0f;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Health")
 	float Health = MaxHealth;
-	UFUNCTION(BlueprintCallable, Category = "Health")
-	void HealthIncrease();
+	
 	void ApplyDamage(float Damage);
 	bool bIsDead = false;
 
@@ -31,7 +30,10 @@ public:
 protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
-
+UFUNCTION(BlueprintCallable, Category = "Health")
+	void IncreaseMaxHealth();
+	UPROPERTY(BlueprintAssignable, Category="Health")
+	FOnHealthChanged OnHealthChanged;
 public:	
 	// Called every frame
 	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;

@@ -114,7 +114,10 @@ void ACactusGameCharacter::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("StarterWeaponClass is NULL — set it in BP defaults!"));
 	}
-	
+	if (HealthComponent)
+	{
+		HealthComponent->Health = HealthComponent->MaxHealth;
+	}
 }
 
 float ACactusGameCharacter::TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent,
