@@ -14,6 +14,7 @@
 #include "Engine/Engine.h"
 #include "Blueprint/UserWidget.h"
 #include "Engine/LocalPlayer.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -75,6 +76,35 @@ void ACactusGameCharacter::WeaponDrop(const FInputActionValue& Value)
 void ACactusGameCharacter::Reload(const FInputActionValue& Value)
 {
 	CurrentWeapon->Reload();
+}
+
+void ACactusGameCharacter::AirDash(const FInputActionValue& Value)
+{
+	FVector Forward = GetActorForwardVector() * AirDashDistance;
+	if (GetCharacterMovement()->IsFalling() || bAirDash)
+	{
+		
+		if (DashCount<=0)
+		{
+			GetCharacterMovement()->AddImpulse(Forward);
+			DashCount++;
+			if (GEngine)
+				{
+				GEngine->AddOnScreenDebugMessage(-1, 2.f, FColor::Green, TEXT("AirDash: Dash Count")); 
+				}
+		}
+	}
+	JumpReset();
+}
+
+void ACactusGameCharacter::JumpReset()
+{
+	if (!GetCharacterMovement()->IsFalling())
+	{
+		DashCount = 0;
+		bAirDash = false; 
+		
+	}
 }
 
 void ACactusGameCharacter::CallWidget_ConnectToWeapon(ABaseWeapon* Weapon)
@@ -158,9 +188,9 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent))
 	{
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
+		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACactusGameCharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
-		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Move);
+		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Move);		
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Look);
 		EnhancedInputComponent->BindAction(InventoryAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::CheckInventory);
 		EnhancedInputComponent->BindAction(FireAction, ETriggerEvent::Started, this, &ACactusGameCharacter::FireWeaponStart);
@@ -169,6 +199,7 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 		EnhancedInputComponent->BindAction(WeaponSwitch,ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponSwap);
 		EnhancedInputComponent->BindAction(DropItem, ETriggerEvent::Completed, this, &ACactusGameCharacter::WeaponDrop);
 		EnhancedInputComponent->BindAction(ReloadAction, ETriggerEvent::Triggered, this, &ACactusGameCharacter::Reload);
+		EnhancedInputComponent->BindAction(AirDashAction, ETriggerEvent::Started, this, &ACactusGameCharacter::AirDash);
 	}
 	else
 	{
@@ -176,6 +207,19 @@ void ACactusGameCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInpu
 	}
 }
 
+
+void ACactusGameCharacter::Jump()
+{
+	Super::Jump();
+	bAirDash = true;
+}
+
+void ACactusGameCharacter::Landed(const FHitResult& Hit)
+{
+	Super::Landed(Hit);
+	bAirDash = false;
+	DashCount = 0;
+}
 
 void ACactusGameCharacter::Move(const FInputActionValue& Value)
 {

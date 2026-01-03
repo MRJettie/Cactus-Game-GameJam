@@ -52,6 +52,9 @@ class ACactusGameCharacter : public ACharacter
 	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ReloadAction;
 	
+	UPROPERTY(EditAnywhere,BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* AirDashAction;
+	
 public:
 	ACactusGameCharacter();
 	
@@ -79,7 +82,13 @@ public:
 	void WeaponDrop(const FInputActionValue& Value);
 	UFUNCTION()
 	void Reload(const FInputActionValue& Value);
-
+	
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dash Count")
+	int DashCount;
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dash Count")
+	int MaxDashCount;
+	void AirDash(const FInputActionValue& Value);
+	void JumpReset();
 	//User Interface
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "User Interface")
 	UUserWidget* WeaponHud = nullptr;
@@ -90,6 +99,11 @@ protected:
 	float TakeDamage(float DamageAmount, struct FDamageEvent const& DamageEvent, class AController* EventInstigator, AActor* DamageCauser) override;
 	void FireWeaponStart(const FInputActionValue& Value);
 	void FireWeaponEnd (const FInputActionValue& Value);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "AirDash Distance")
+	float AirDashDistance = 10000;
+	bool bAirDash = false;
+	void Jump() override;
+	void Landed(const FHitResult& Hit) override;
 	
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
